@@ -41,7 +41,8 @@ public class FileMetadataDto {
 
   @Builder
   public FileMetadataDto(Long contentLength, String contentType, String id, String checksum,
-      String filename, String fieldName, String formKey) {
+                         String filename, String fieldName, String formKey, Integer imageMaxWidth,
+                         Integer imageMaxHeight, Integer compressionQuality) {
     this.contentLength = contentLength;
     this.contentType = contentType;
     userMetadata.put(UserMetadataHeaders.ID.getValue(), id);
@@ -49,6 +50,9 @@ public class FileMetadataDto {
     userMetadata.put(UserMetadataHeaders.FILENAME.getValue(), filename);
     userMetadata.put(UserMetadataHeaders.FIELD_NAME.getValue(), fieldName);
     userMetadata.put(UserMetadataHeaders.FORM_KEY.getValue(), formKey);
+    userMetadata.put(UserMetadataHeaders.IMAGE_MAX_WIDTH.getValue(), imageMaxWidth == null ? null : imageMaxWidth.toString());
+    userMetadata.put(UserMetadataHeaders.IMAGE_MAX_HEIGHT.getValue(), imageMaxHeight == null ? null : imageMaxHeight.toString());
+    userMetadata.put(UserMetadataHeaders.COMPRESSION_QUALITY.getValue(), compressionQuality == null ? null : compressionQuality.toString());
   }
 
   public String getId() {
@@ -71,6 +75,28 @@ public class FileMetadataDto {
     return userMetadata.get(UserMetadataHeaders.FORM_KEY.getValue());
   }
 
+  public Integer getImageMaxWidth() {
+    return getIntegerValue(UserMetadataHeaders.IMAGE_MAX_WIDTH);
+  }
+
+  public Integer getImageMaxHeight() {
+    return getIntegerValue(UserMetadataHeaders.IMAGE_MAX_HEIGHT);
+  }
+
+  public Integer getCompressionQuality() {
+    return getIntegerValue(UserMetadataHeaders.COMPRESSION_QUALITY);
+  }
+
+  private Integer getIntegerValue(UserMetadataHeaders userMetadataHeaders) {
+    var value = userMetadata.get(userMetadataHeaders.getValue());
+
+    if (value == null || value.isBlank()) {
+      return null;
+    } else {
+      return Integer.valueOf(value);
+    }
+  }
+
   @Getter
   @RequiredArgsConstructor
   public enum UserMetadataHeaders {
@@ -79,7 +105,10 @@ public class FileMetadataDto {
     CHECKSUM("checksum"),
     FILENAME("filename"),
     FIELD_NAME("fieldName"),
-    FORM_KEY("formKey");
+    FORM_KEY("formKey"),
+    IMAGE_MAX_WIDTH("imageMaxWidth"),
+    IMAGE_MAX_HEIGHT("imageMaxHeight"),
+    COMPRESSION_QUALITY("compression_quality");
 
     private final String value;
 
